@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SmartPark Zone</title>
+  <style>
+    body {
+      background-color: #ffe6f0;
+      font-family: Arial, sans-serif;
+      color: #333;
+      padding: 30px;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #d63384;
+      text-align: center;
+    }
+
+    label, select, input, button {
+      display: block;
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #d63384;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #bf2c75;
+    }
+
+    #confirmation {
+      margin-top: 20px;
+      background-color: #ffd9ec;
+      padding: 15px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .slot-list {
+      margin-top: 30px;
+    }
+
+    .slot {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .available {
+      background-color: #e0ffe0;
+      color: #006600;
+    }
+
+    .booked {
+      background-color: #ffe0e0;
+      color: #990000;
+    }
+
+    .cancel-btn {
+      background: transparent;
+      color: #990000;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      float: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>SmartPark Zone</h1>
+
+    <label for="username">Your Name:</label>
+    <input type="text" id="username" placeholder="e.g. Aisha" />
+
+    <label for="slot">Select Parking Slot:</label>
+    <select id="slot"></select>
+
+    <button onclick="bookSlot()">Book Slot</button>
+
+    <div id="confirmation"></div>
+
+    <div class="slot-list" id="slotList"></div>
+  </div>
+
+  <script>
+    const slots = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2'];
+    const booked = {};
+
+    function populateSlotOptions() {
+      const dropdown = document.getElementById('slot');
+      dropdown.innerHTML = '';
+      dropdown.innerHTML = `<option value="">-- Choose Slot --</option>`;
+      slots.forEach(slot => {
+        if (!booked[slot]) {
+          const option = document.createElement('option');
+          option.value = slot;
+          option.textContent = slot;
+          dropdown.appendChild(option);
+        }
+      });
+    }
+
+    function updateSlotList() {
+      const list = document.getElementById('slotList');
+      list.innerHTML = `<h3>Live Slot Status:</h3>`;
+      slots.forEach(slot => {
+        const div = document.createElement('div');
+        div.classList.add('slot');
+        if (booked[slot]) {
+          div.classList.add('booked');
+          div.innerHTML = `${slot} - Booked by ${booked[slot]} <button class="cancel-btn" onclick="cancelBooking('${slot}')">×</button>`;
+        } else {
+          div.classList.add('available');
+          div.textContent = `${slot} - Available`;
+        }
+        list.appendChild(div);
+      });
+    }
+
+    function bookSlot() {
+      const name = document.getElementById('username').value.trim();
+      const slot = document.getElementById('slot').value;
+
+      if (!name || !slot) {
+        alert("Please fill in your name and choose a slot.");
+        return;
+      }
+
+      if (booked[slot]) {
+        alert("Slot already booked.");
+        return;
+      }
+
+      booked[slot] = name;
+      document.getElementById('confirmation').style.display = 'block';
+      document.getElementById('confirmation').innerHTML =
+        `<strong>✅ Booking Successful!</strong><br>Name: ${name}<br>Slot: ${slot}`;
+
+      populateSlotOptions();
+      updateSlotList();
+
+      document.getElementById('username').value = '';
+      document.getElementById('slot').value = '';
+    }
+
+    function cancelBooking(slot) {
+      delete booked[slot];
+      populateSlotOptions();
+      updateSlotList();
+      document.getElementById('confirmation').innerHTML = `<strong>❌ Booking cancelled for slot ${slot}</strong>`;
+    }
+
+    // Init
+    populateSlotOptions();
+    updateSlotList();
+  </script>
+</body>
+</html>
